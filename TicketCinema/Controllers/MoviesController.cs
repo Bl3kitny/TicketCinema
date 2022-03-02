@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using TicketCinema.Data;
+using System.Linq;
 
 namespace TicketCinema.Controllers
 {
@@ -9,15 +10,15 @@ namespace TicketCinema.Controllers
     {
         private readonly AppDbContext _context;
 
-        public MoviesController(AppDbContext context)
+        public MoviesController(AppDbContext context) 
         {
             _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            var allMovies = await _context.Cinemas.ToListAsync();
-            return View();
+            var allMovies = await _context.Movies.Include(n =>n.Cinema).OrderBy(n=>n.Name).ToListAsync();
+            return View(allMovies);
         }
     }
 }
