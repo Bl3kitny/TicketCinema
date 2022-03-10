@@ -3,41 +3,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TicketCinema.Models;
+using System;
 
 namespace TicketCinema.Data.Services
 {
     public class ActorsService : IActorsService
     {
         private readonly AppDbContext _context;
-
         public ActorsService(AppDbContext context)
         {
-               _context = context;
-        }
-        public void Add(Actor actor)
-        {
-            throw new System.NotImplementedException();
+            _context = context;
         }
 
-        public void Delete(int id)
+        public async Task AddAsync(Actor actor)
         {
-            throw new System.NotImplementedException();
+            await _context.Actors.AddAsync(actor);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Actor>> GetAll()
+        public async Task DeleteAsync(int id)
+        {
+            var result = await _context.Actors.FirstOrDefaultAsync(x => x.Id == id);
+            _context.Actors.Remove(result);
+            await _context.SaveChangesAsync();
+
+        }
+
+        public async Task<IEnumerable<Actor>> GetAllAsync()
         {
             var result = await _context.Actors.ToListAsync();
             return result;
         }
 
-        public Actor GetById(int id)
+        public async Task<Actor> GetByIdAsync(int id)
         {
-            throw new System.NotImplementedException();
+            var result = await _context.Actors.FirstOrDefaultAsync(x => x.Id == id);
+            return result;
         }
 
-        public Actor Update(int id, Actor newActor)
+        public async Task<Actor> UpdateAsync(int id, Actor newActor)
         {
-            throw new System.NotImplementedException();
+            _context.Update(newActor);
+            await _context.SaveChangesAsync();
+            return newActor;
         }
     }
 }
