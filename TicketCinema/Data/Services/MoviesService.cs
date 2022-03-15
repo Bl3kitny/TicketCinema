@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TicketCinema.Data.Base;
 using TicketCinema.Models;
@@ -7,9 +8,21 @@ namespace TicketCinema.Data.Services
 {
     public class MoviesService : EntityBaseRepository<Movie>, IMoviesService
     {
+        private readonly AppDbContext _context;
         public MoviesService(AppDbContext context):base(context)
         {
+            _context = context;
+        }
 
+        public async Task<Movie> GetMovieByIdAsync(int id)
+        {
+            var movieDetails = _context.Movies
+                .Include(c=>c.Cinema)
+                .Include(p=>p.Producer)
+                .Include(am=>am.Actors_Movies).ThenInclude(a=>a.Actor)
+                .FirstOrDefaultAsync(n=>n.Id == id);
+
+            return await movieDetails;
         }
     }
 }

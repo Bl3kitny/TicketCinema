@@ -21,5 +21,11 @@ namespace TicketCinema.Controllers
             var allMovies = await _service.GetAllAsync(n=>n.Cinema);
             return View(allMovies);
         }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var movie = await _service.GetMovieByIdAsync(id);
+            return View(movie);
+        }
     }
 }
