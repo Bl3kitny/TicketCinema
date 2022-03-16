@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using TicketCinema.Data;
 using System.Linq;
 using TicketCinema.Data.Services;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using TicketCinema.Models;
 
 namespace TicketCinema.Controllers
 {
@@ -27,5 +29,36 @@ namespace TicketCinema.Controllers
             var movie = await _service.GetMovieByIdAsync(id);
             return View(movie);
         }
+
+        public async Task<IActionResult> Create()
+        {
+            var movieDropdowns = await _service.GetNewMovieDropdownsValues();
+
+            ViewBag.Cinemas = new SelectList(movieDropdowns.Cinemas, "Id", "Name");
+            ViewBag.Producers = new SelectList(movieDropdowns.Producers, "Id", "FullName");
+            ViewBag.Actors = new SelectList(movieDropdowns.Actors, "Id", "FullName");
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(NewMovieVM movie)
+        {
+            var movieDropdowns = await _service.GetNewMovieDropdownsValues();
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Cinemas = new SelectList(movieDropdowns.Cinemas, "Id", "Name");
+                ViewBag.Producers = new SelectList(movieDropdowns.Producers, "Id", "FullName");
+                ViewBag.Actors = new SelectList(movieDropdowns.Actors, "Id", "FullName");
+                return View (movie);
+            }
+
+            await _service.AddNewMovieAsync(movie);
+
+            return RedirectToAction("Index");
+        }
+
+
+
+
     }
 }
